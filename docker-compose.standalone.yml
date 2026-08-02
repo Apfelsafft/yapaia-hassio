@@ -1,0 +1,20 @@
+services:
+  yapaia-routing:
+    build: ./yapaia-routing
+    container_name: yapaia-routing
+    restart: unless-stopped
+    volumes:
+      - ./data/routing:/data
+    ports:
+      - "8989:8989"
+
+  yapaia:
+    build: ./yapaia
+    container_name: yapaia
+    restart: unless-stopped
+    depends_on:
+      - yapaia-routing
+    volumes:
+      - ./data/yapaia:/data
+    ports:
+      - "8080:8080"

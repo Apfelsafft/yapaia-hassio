@@ -1,0 +1,6 @@
+{
+  "region": "germany",
+  "pbf_url": "https://download.geofabrik.de/europe/germany-latest.osm.pbf",
+  "java_heap_gb": 4,
+  "reimport_on_startup": false
+}

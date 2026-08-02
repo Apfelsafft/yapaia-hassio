@@ -1,0 +1,11 @@
+{
+  "secret_key": "",
+  "admin_emails": "deine@email.de",
+  "graphhopper_url": "http://yapaia-routing:8989",
+  "photon_url": "",
+  "google_client_id": "",
+  "google_client_secret": "",
+  "gps_serial_port": "",
+  "gps_serial_baud": 9600,
+  "log_level": "info"
+}

@@ -70,6 +70,38 @@ in [docs/HOME_ASSISTANT_ADDON.md](docs/HOME_ASSISTANT_ADDON.md).
 
 ---
 
+## Standalone-Betrieb ohne Home Assistant (z. B. auf einem VPS)
+
+Die Container basieren auf HA-Base-Images (`bashio`), lassen sich aber auch
+ohne Supervisor per Docker Compose betreiben — `bashio::config` liest dazu
+lokal aus `/data/options.json`, die man selbst anlegt.
+
+```bash
+git clone https://github.com/apfelsafft/yapaia-hassio.git
+cd yapaia-hassio
+
+mkdir -p data/yapaia data/routing
+cp yapaia/options.json.example data/yapaia/options.json
+cp yapaia-routing/options.json.example data/routing/options.json
+# Werte in beiden Dateien nach Bedarf anpassen (z. B. admin_emails, region)
+
+docker compose -f docker-compose.standalone.yml up -d --build
+```
+
+Yapaia Go ist danach unter `http://<VPS-IP>:8080` erreichbar, die
+GraphHopper-API unter Port 8989. Der erste Start des Routing-Containers lädt
+die OSM-Daten herunter und importiert den Graph (bei `region: germany`
+ca. 20–40 Minuten) — Fortschritt mit `docker compose -f
+docker-compose.standalone.yml logs -f yapaia-routing` verfolgen.
+
+**Einschränkungen gegenüber dem echten Add-on:** Die MQTT-Auto-Discovery über
+`bashio::services mqtt` und Ingress funktionieren nur unter dem HA
+Supervisor. Für MQTT im Standalone-Betrieb müssen `MQTT_HOST` /
+`MQTT_PORT` / `MQTT_USERNAME` / `MQTT_PASSWORD` manuell als
+`environment:`-Variablen im Compose-File ergänzt werden.
+
+---
+
 ## Älterer Single-Add-on-Versuch
 
 Unter [`legacy/`](legacy/) liegt der erste, inzwischen abgelöste
