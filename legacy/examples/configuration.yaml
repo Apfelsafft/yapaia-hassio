@@ -1,0 +1,49 @@
+# ============================================================
+# Navi — Home Assistant MQTT Konfiguration
+# ============================================================
+# Normalerweise werden alle Sensoren automatisch über
+# MQTT Auto-Discovery registriert (kein manueller Eintrag nötig).
+# Falls Auto-Discovery deaktiviert ist, diese Zeilen in
+# configuration.yaml eintragen.
+# ============================================================
+
+mqtt:
+  sensor:
+    - name: "Navigation Status"
+      unique_id: "navi_status"
+      state_topic: "navi/status"
+      icon: "mdi:navigation"
+
+    - name: "Aktuelle Anweisung"
+      unique_id: "navi_instruction"
+      state_topic: "navi/instruction"
+      value_template: "{{ value_json.text }}"
+      icon: "mdi:sign-direction"
+
+    - name: "Verbleibende Distanz"
+      unique_id: "navi_distance"
+      state_topic: "navi/route"
+      value_template: "{{ value_json.distance_remaining }}"
+      unit_of_measurement: "m"
+      icon: "mdi:map-marker-distance"
+
+    - name: "Ankunft in"
+      unique_id: "navi_eta"
+      state_topic: "navi/route"
+      value_template: "{{ value_json.duration_remaining }}"
+      unit_of_measurement: "s"
+      icon: "mdi:clock-outline"
+
+    - name: "Navi Geschwindigkeit"
+      unique_id: "navi_speed"
+      state_topic: "navi/position"
+      value_template: "{{ value_json.speed }}"
+      unit_of_measurement: "km/h"
+      icon: "mdi:speedometer"
+
+  device_tracker:
+    - name: "Navi Fahrzeug"
+      unique_id: "navi_vehicle"
+      state_topic: "navi/status"
+      json_attributes_topic: "navi/position"
+      icon: "mdi:car"

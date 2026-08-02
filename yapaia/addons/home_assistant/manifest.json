@@ -1,0 +1,29 @@
+{
+  "id": "home_assistant",
+  "name": "Home Assistant",
+  "version": "1.0.0",
+  "description": "Überträgt Navigationsstatus, Position und Anweisungen direkt per REST-API an Home Assistant.",
+  "icon": "🏠",
+  "author": "Yapaia Team",
+  "category": "integration",
+  "capabilities": ["settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "ha_base_url",
+      "type": "text",
+      "label": "Home Assistant URL",
+      "required": true,
+      "placeholder": "http://homeassistant.local:8123",
+      "description": "Vollständige URL deiner HA-Instanz."
+    },
+    {
+      "key": "ha_token",
+      "type": "password",
+      "label": "Long-Lived Access Token",
+      "required": true,
+      "placeholder": "eyJhbGci…",
+      "description": "In HA unter Profil → Sicherheit → Langlebige Zugriffstoken erstellen."
+    }
+  ]
+}

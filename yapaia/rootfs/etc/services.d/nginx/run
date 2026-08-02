@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# nginx: serves the Vite-built frontend (static) and reverse-proxies
+# /api/* and /ws/* to the FastAPI backend on 127.0.0.1:8000.
+# Started after backend (s6 dependency) — but nginx alone won't fail if backend
+# is still booting; clients see 502 briefly.
+# ==============================================================================
+bashio::log.info "Starting nginx ..."
+exec nginx -g "daemon off;"

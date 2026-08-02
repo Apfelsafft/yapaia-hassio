@@ -1,0 +1,27 @@
+{
+  "id": "mqtt_client",
+  "name": "MQTT",
+  "version": "1.0.0",
+  "description": "Veröffentlicht Navigationsdaten (Position, Route, Anweisungen) über MQTT. Ermöglicht Home Assistant Auto-Discovery.",
+  "icon": "📡",
+  "author": "Yapaia Team",
+  "category": "integration",
+  "capabilities": ["settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "enabled",
+      "type": "boolean",
+      "label": "MQTT-Veröffentlichung aktivieren",
+      "default": true,
+      "description": "Navigationsdaten an den MQTT-Broker senden."
+    },
+    {
+      "key": "info",
+      "type": "text",
+      "label": "Broker-Info",
+      "default": "",
+      "description": "Broker-Adresse und Port werden serverseitig konfiguriert (MQTT_HOST / MQTT_PORT in .env)."
+    }
+  ]
+}

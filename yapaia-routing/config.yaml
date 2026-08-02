@@ -1,0 +1,35 @@
+name: Yapaia Routing (GraphHopper)
+version: "0.5.0"
+slug: yapaia_routing
+description: GraphHopper-Routing-Engine für Yapaia. Benötigt ≥6 GB RAM und ≥20 GB freien Plattenplatz für DACH-Datensatz.
+url: https://github.com/Apfelsafft/yapaia-hassio
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: services
+boot: auto
+hassio_api: false
+homeassistant_api: false
+ingress: false
+host_network: false
+map:
+  - "data:rw"
+ports:
+  8989/tcp: 8989
+ports_description:
+  8989/tcp: "GraphHopper HTTP-API (nur in lokalem Netz freigeben)"
+options:
+  region: "germany"
+  pbf_url: "https://download.geofabrik.de/europe/germany-latest.osm.pbf"
+  java_heap_gb: 4
+  reimport_on_startup: false
+schema:
+  region: "list(germany|dach|europe|custom)"
+  pbf_url: "url"
+  java_heap_gb: "int(2,16)"
+  reimport_on_startup: "bool"
+backup: cold
+backup_exclude:
+  - "graph-cache/**"
+  - "*.osm.pbf"

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1f2937" />
+    <meta name="description" content="Yapaia Go — Smart RV Navigation" />
+    <meta property="og:title" content="Yapaia Go" />
+    <meta property="og:description" content="Smart RV Solutions — Navigation, Routing, Home Assistant Integration" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/Yapaia_icon_192.png" />
+    <link rel="apple-touch-icon" href="/Yapaia_icon_192.png" />
+    <title>Yapaia Go</title>
+    <script>
+      // ── Home Assistant Ingress compatibility shim ──────────────────────
+      // When loaded inside HA's ingress iframe, the page URL contains
+      // /api/hassio_ingress/<token>/ as a prefix. Absolute paths like
+      // fetch("/api/route") would bypass the ingress proxy and hit HA core.
+      // This shim transparently prepends the prefix to all /api and /ws
+      // requests (fetch + WebSocket). It is a no-op outside Ingress.
+      (function () {
+        var path = window.location.pathname;
+        var m = path.match(/^(\/api\/hassio_ingress\/[^\/]+)/);
+        if (!m) return;
+        var base = m[1];
+        window.__YAPAIA_INGRESS_BASE__ = base;
+        var origFetch = window.fetch.bind(window);
+        window.fetch = function (input, init) {
+          try {
+            if (typeof input === "string") {
+              if (input.startsWith("/api/") || input.startsWith("/ws/")) {
+                input = base + input;
+              }
+            } else if (input && input.url) {
+              var u = input.url;
+              if (u.startsWith("/api/") || u.startsWith("/ws/")) {
+                input = new Request(base + u, input);
+              }
+            }
+          } catch (e) { /* fall through to native fetch */ }
+          return origFetch(input, init);
+        };
+        var OrigWS = window.WebSocket;
+        function PatchedWS(url, protocols) {
+          try {
+            if (typeof url === "string") {
+              // Absolute ws(s)://host/ws/...
+              var abs = url.match(/^(wss?:\/\/[^\/]+)(\/.*)$/);
+              if (abs && (abs[2].startsWith("/ws/") || abs[2].startsWith("/api/"))) {
+                url = abs[1] + base + abs[2];
+              } else if (url.startsWith("/ws/") || url.startsWith("/api/")) {
+                url = base + url;
+              }
+            }
+          } catch (e) { /* fall through */ }
+          return protocols ? new OrigWS(url, protocols) : new OrigWS(url);
+        }
+        PatchedWS.prototype = OrigWS.prototype;
+        PatchedWS.CONNECTING = OrigWS.CONNECTING;
+        PatchedWS.OPEN = OrigWS.OPEN;
+        PatchedWS.CLOSING = OrigWS.CLOSING;
+        PatchedWS.CLOSED = OrigWS.CLOSED;
+        window.WebSocket = PatchedWS;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

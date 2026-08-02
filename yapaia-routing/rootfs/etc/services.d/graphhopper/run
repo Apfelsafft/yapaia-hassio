@@ -1,0 +1,46 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start GraphHopper HTTP service on :8989.
+# OSM data is downloaded once into /data/<region>.osm.pbf on first start;
+# the graph cache lives under /data/graph-cache and is reused across restarts.
+# ==============================================================================
+set -e
+
+REGION=$(bashio::config 'region')
+PBF_URL=$(bashio::config 'pbf_url')
+HEAP_GB=$(bashio::config 'java_heap_gb')
+REIMPORT=$(bashio::config 'reimport_on_startup')
+
+PBF_FILE="/data/${REGION}-latest.osm.pbf"
+CACHE_DIR="/data/graph-cache"
+
+# ── 1. Download OSM extract if missing ───────────────────────────────────────
+if [ ! -f "${PBF_FILE}" ]; then
+    bashio::log.info "Downloading OSM extract '${REGION}' from ${PBF_URL}"
+    bashio::log.info "This is a one-time operation and may take a while."
+    if ! wget -q --show-progress -O "${PBF_FILE}.tmp" "${PBF_URL}"; then
+        bashio::log.error "Failed to download OSM extract"
+        rm -f "${PBF_FILE}.tmp"
+        bashio::exit.nok
+    fi
+    mv "${PBF_FILE}.tmp" "${PBF_FILE}"
+    bashio::log.info "Download complete. Graph import will start now."
+fi
+
+# ── 2. Optionally wipe graph cache for a fresh reimport ──────────────────────
+if [ "${REIMPORT}" = "true" ] && [ -d "${CACHE_DIR}" ]; then
+    bashio::log.warning "reimport_on_startup=true — wiping graph-cache"
+    rm -rf "${CACHE_DIR}"
+fi
+
+mkdir -p "${CACHE_DIR}"
+
+# ── 3. Launch GraphHopper ────────────────────────────────────────────────────
+# Heap size from add-on options; min 1g to bootstrap.
+bashio::log.info "Starting GraphHopper (heap=${HEAP_GB}g) ..."
+cd /opt/graphhopper
+exec java \
+    -Xmx${HEAP_GB}g -Xms1g \
+    -Ddw.graphhopper.datareader.file="${PBF_FILE}" \
+    -Ddw.graphhopper.graph.location="${CACHE_DIR}" \
+    -jar graphhopper.jar server config.yml

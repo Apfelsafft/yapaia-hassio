@@ -1,0 +1,11 @@
+{
+  "id": "mapstyle",
+  "name": "Kartenstile",
+  "version": "1.0.0",
+  "icon": "🗺️",
+  "author": "Yapaia Team",
+  "category": "map",
+  "description": "Wähle verschiedene Kartenstile für den Hell- und Dunkel-Modus. Enthält einen optimierten Nacht-Modus mit deutlich besserem Kontrast.",
+  "capabilities": ["settings"],
+  "settings_schema": []
+}

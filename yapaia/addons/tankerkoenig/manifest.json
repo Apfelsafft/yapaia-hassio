@@ -1,0 +1,42 @@
+{
+  "id": "tankerkoenig",
+  "name": "Tankstellen",
+  "version": "1.0.0",
+  "description": "Zeigt günstige Tankstellen in der Nähe und entlang der Route an. Daten von Tankerkönig (MTS-K Preisliste).",
+  "icon": "⛽",
+  "author": "Yapaia Team",
+  "category": "map",
+  "capabilities": ["map_layer", "settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "api_key",
+      "type": "password",
+      "label": "Tankerkönig API-Key",
+      "required": true,
+      "placeholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "description": "Kostenloser API-Key unter creativecommons.tankerkoenig.de registrieren."
+    },
+    {
+      "key": "fuel_type",
+      "type": "select",
+      "label": "Kraftstoffsorte (Fallback)",
+      "default": "e5",
+      "description": "Wird vom aktiven Fahrzeugprofil überschrieben.",
+      "options": [
+        { "value": "e5", "label": "Super E5" },
+        { "value": "e10", "label": "Super E10" },
+        { "value": "diesel", "label": "Diesel" }
+      ]
+    },
+    {
+      "key": "radius",
+      "type": "range",
+      "label": "Suchradius (km)",
+      "default": 5,
+      "min": 1,
+      "max": 25,
+      "step": 1
+    }
+  ]
+}

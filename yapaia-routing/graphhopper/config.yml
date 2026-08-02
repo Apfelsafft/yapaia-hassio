@@ -1,0 +1,44 @@
+graphhopper:
+  datareader.file: /data/osm/dach-latest.osm.pbf
+  graph.location: /data/graphhopper/graph-cache
+  graph.dataaccess: MMAP
+  import.osm.ignored_highways: [escape, razed, demolished, proposed, construction]
+  # OSM-Tags, die wir im custom_model des motorhome-Profils referenzieren.
+  # Ohne diese Einträge meldet GraphHopper "max_height not available".
+  # ACHTUNG: Änderung erfordert kompletten Re-Import des graph-cache.
+  graph.encoded_values: max_height,max_weight,max_width
+
+  profiles:
+    - name: car
+      vehicle: car
+      weighting: custom
+      custom_model_files: []
+    - name: bike
+      vehicle: bike
+      weighting: custom
+      custom_model_files: []
+    - name: foot
+      vehicle: foot
+      weighting: custom
+      custom_model_files: []
+    - name: motorhome
+      vehicle: car
+      weighting: custom
+      custom_model_files: []
+
+  profiles_ch:
+    - profile: car
+    - profile: bike
+
+server:
+  application_connectors:
+    - type: http
+      port: 8989
+      bind_host: 0.0.0.0
+  admin_connectors:
+    - type: http
+      port: 8990
+      bind_host: 0.0.0.0
+
+logging:
+  level: WARN

@@ -1,0 +1,41 @@
+{
+  "id": "track_recorder",
+  "name": "Track Recorder",
+  "version": "1.0.0",
+  "description": "Zeichnet die letzten Fahrten auf: Dauer, Distanz, Geschwindigkeit, Position und Höhe. Tracks werden automatisch auf der Karte angezeigt.",
+  "icon": "⏺️",
+  "author": "Yapaia Team",
+  "category": "utility",
+  "capabilities": ["settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "max_tracks",
+      "type": "range",
+      "label": "Maximale Anzahl gespeicherter Tracks",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "description": "Älteste Tracks werden automatisch gelöscht."
+    },
+    {
+      "key": "min_distance_m",
+      "type": "number",
+      "label": "Mindestdistanz für neuen Track (Meter)",
+      "default": 100,
+      "min": 10,
+      "max": 5000,
+      "description": "GPS-Rauschen unterhalb dieser Distanz wird ignoriert."
+    },
+    {
+      "key": "gap_minutes",
+      "type": "number",
+      "label": "Neue Fahrt nach Pause (Minuten)",
+      "default": 5,
+      "min": 1,
+      "max": 60,
+      "description": "Nach dieser Pause ohne GPS-Update gilt die Fahrt als beendet."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+# ============================================================
+# Navi — Lovelace Dashboard Beispiel
+# ============================================================
+# In Home Assistant: Einstellungen → Dashboards → Dashboard hinzufügen
+# → YAML-Modus → diesen Code einfügen
+# NAVI_HOST durch IP/Hostname des Navi-Servers ersetzen.
+# ============================================================
+
+title: Navigation
+views:
+  - title: Navi
+    icon: mdi:navigation
+    cards:
+      # iFrame — die komplette Navigations-App
+      - type: iframe
+        url: http://NAVI_HOST:8080
+        aspect_ratio: "16:9"
+        title: Navigation
+
+      # Status-Übersicht
+      - type: entities
+        title: Fahrstatus
+        entities:
+          - entity: sensor.navigation_status
+            name: Status
+          - entity: sensor.aktuelle_anweisung
+            name: Nächste Abbiegung
+          - entity: sensor.verbleibende_distanz
+            name: Noch
+          - entity: sensor.ankunft_in
+            name: ETA
+          - entity: sensor.navi_geschwindigkeit
+            name: Tempo
+
+      # Fahrzeugposition auf der Karte
+      - type: map
+        title: Fahrzeugposition
+        entities:
+          - entity: device_tracker.navi_fahrzeug
+        hours_to_show: 0
+        aspect_ratio: "16:9"

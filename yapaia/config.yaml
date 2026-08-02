@@ -1,0 +1,52 @@
+name: Yapaia Go
+version: "0.5.0"
+slug: yapaia
+description: Browserbasiertes Turn-by-Turn-Navi mit Add-on-System. Läuft komplett lokal, eingebettet in die HA-Sidebar.
+url: https://github.com/Apfelsafft/yapaia-hassio
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: application
+boot: auto
+hassio_api: false
+homeassistant_api: false
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:navigation-variant
+panel_title: Yapaia Navi
+host_network: false
+map:
+  - "data:rw"
+ports:
+  8080/tcp: null
+ports_description:
+  8080/tcp: "Web-UI (nur falls direkter Zugriff ohne Ingress gewünscht)"
+udev: true
+services:
+  - mqtt:want
+discovery: []
+options:
+  secret_key: ""
+  admin_emails: ""
+  graphhopper_url: ""
+  photon_url: ""
+  google_client_id: ""
+  google_client_secret: ""
+  gps_serial_port: ""
+  gps_serial_baud: 9600
+  log_level: info
+schema:
+  secret_key: "password?"
+  admin_emails: "str?"
+  graphhopper_url: "url?"
+  photon_url: "url?"
+  google_client_id: "str?"
+  google_client_secret: "password?"
+  gps_serial_port: "str?"
+  gps_serial_baud: "int(1200,115200)"
+  log_level: "list(debug|info|warning|error)"
+backup: hot
+backup_exclude:
+  - "*.tmp"
+  - "graphhopper-cache/**"

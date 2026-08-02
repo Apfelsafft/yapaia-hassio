@@ -1,0 +1,60 @@
+name: Build HA Add-ons
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "yapaia/**"
+      - "yapaia-routing/**"
+      - ".github/workflows/build.yml"
+  workflow_dispatch:
+    inputs:
+      addon:
+        description: "Which add-on to build (yapaia / yapaia-routing / all)"
+        required: true
+        default: "all"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: [yapaia, yapaia-routing]
+        arch: [amd64, aarch64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read add-on version
+        id: meta
+        run: |
+          VERSION=$(grep '^version:' ${{ matrix.addon }}/config.yaml | awk -F'"' '{print $2}')
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build & push add-on image
+        uses: home-assistant/builder@2025.03.0
+        with:
+          args: |
+            --${{ matrix.arch }} \
+            --target ${{ matrix.addon }} \
+            --image ghcr.io/apfelsafft/yapaia-hassio/{arch}-${{ matrix.addon }} \
+            --version ${{ steps.meta.outputs.version }} \
+            --docker-hub ghcr.io \
+            --no-latest \
+            --addon

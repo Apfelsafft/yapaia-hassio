@@ -1,0 +1,47 @@
+{
+  "id": "navi_ai",
+  "name": "KI-Navigation",
+  "version": "1.0.0",
+  "description": "Natürlichsprachige Routenplanung per Text oder Spracheingabe. Unterstützt Claude, OpenAI und lokales Ollama als KI-Provider.",
+  "icon": "✨",
+  "author": "Yapaia Team",
+  "category": "navigation",
+  "capabilities": ["settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "provider",
+      "type": "select",
+      "label": "KI-Provider",
+      "default": "claude",
+      "description": "Welchen KI-Dienst soll Navi für die Sprachverarbeitung nutzen?",
+      "options": [
+        { "value": "claude", "label": "Anthropic Claude (Cloud)" },
+        { "value": "openai", "label": "OpenAI GPT (Cloud)" },
+        { "value": "ollama", "label": "Ollama (lokal)" }
+      ]
+    },
+    {
+      "key": "api_key",
+      "type": "password",
+      "label": "API-Schlüssel",
+      "placeholder": "sk-ant-... oder sk-...",
+      "description": "API-Schlüssel für Claude oder OpenAI. Bei Ollama leer lassen."
+    },
+    {
+      "key": "model",
+      "type": "text",
+      "label": "Modell",
+      "placeholder": "claude-haiku-4-5-20251001 / gpt-4o-mini / llama3.2",
+      "description": "Modellname. Leer lassen für den empfohlenen Standard-Wert des jeweiligen Providers."
+    },
+    {
+      "key": "ollama_url",
+      "type": "text",
+      "label": "Ollama-URL",
+      "default": "http://localhost:11434",
+      "placeholder": "http://localhost:11434",
+      "description": "Basis-URL des lokalen Ollama-Servers. Nur bei Provider = Ollama relevant."
+    }
+  ]
+}

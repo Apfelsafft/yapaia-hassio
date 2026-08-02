@@ -1,0 +1,82 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start Yapaia FastAPI backend (uvicorn) — listens on 127.0.0.1:8000
+# nginx (s6 service "nginx") proxies /api → 127.0.0.1:8000
+# ==============================================================================
+set -e
+
+# ── 1. Load configuration from /data/options.json ────────────────────────────
+SECRET_KEY=$(bashio::config 'secret_key')
+ADMIN_EMAILS=$(bashio::config 'admin_emails')
+GRAPHHOPPER_URL=$(bashio::config 'graphhopper_url')
+PHOTON_URL=$(bashio::config 'photon_url')
+GOOGLE_CLIENT_ID=$(bashio::config 'google_client_id')
+GOOGLE_CLIENT_SECRET=$(bashio::config 'google_client_secret')
+GPS_SERIAL_PORT=$(bashio::config 'gps_serial_port')
+GPS_SERIAL_BAUD=$(bashio::config 'gps_serial_baud')
+LOG_LEVEL=$(bashio::config 'log_level')
+
+# ── 2. Auto-generate SECRET_KEY if empty (persist to /data) ──────────────────
+if bashio::var.is_empty "${SECRET_KEY}"; then
+    if [ ! -f /data/secret_key ]; then
+        bashio::log.warning "secret_key empty — generating one and storing under /data/secret_key"
+        openssl rand -hex 32 > /data/secret_key
+        chmod 600 /data/secret_key
+    fi
+    SECRET_KEY=$(cat /data/secret_key)
+fi
+
+# ── 3. Bind to Mosquitto add-on if available ─────────────────────────────────
+if bashio::services.available "mqtt"; then
+    MQTT_HOST=$(bashio::services mqtt "host")
+    MQTT_PORT=$(bashio::services mqtt "port")
+    MQTT_USERNAME=$(bashio::services mqtt "username")
+    MQTT_PASSWORD=$(bashio::services mqtt "password")
+    bashio::log.info "MQTT service detected: ${MQTT_HOST}:${MQTT_PORT}"
+    export MQTT_HOST MQTT_PORT MQTT_USERNAME MQTT_PASSWORD
+else
+    bashio::log.info "No MQTT service — MQTT features disabled"
+fi
+
+# ── 4. Discover yapaia-routing add-on if installed ───────────────────────────
+if bashio::var.is_empty "${GRAPHHOPPER_URL}"; then
+    # Best-effort probe; Supervisor DNS uses the slug.
+    for candidate in \
+        "http://a0d7b954-yapaia-routing:8989" \
+        "http://local-yapaia-routing:8989" \
+        "http://yapaia-routing:8989"; do
+        if wget -q --spider --timeout=2 "${candidate}/health" 2>/dev/null; then
+            GRAPHHOPPER_URL="${candidate}"
+            bashio::log.info "Auto-discovered routing add-on at ${GRAPHHOPPER_URL}"
+            break
+        fi
+    done
+fi
+
+if bashio::var.is_empty "${GRAPHHOPPER_URL}"; then
+    bashio::log.warning "graphhopper_url not configured — routing requests will fail until set"
+fi
+
+# ── 5. Export all settings as env vars for the FastAPI Settings() class ──────
+export SECRET_KEY ADMIN_EMAILS
+export GRAPHHOPPER_URL PHOTON_URL
+export GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET
+export GPS_SERIAL_PORT GPS_SERIAL_BAUD
+
+# SQLite under /data (persistent, included in HA backups)
+export DATABASE_URL="sqlite+aiosqlite:////data/yapaia.db"
+
+# In Ingress context, browser origin == HA origin (not predictable here);
+# nginx adds CORS headers redundantly. Allow any origin for the API layer.
+export BACKEND_CORS_ORIGINS="*"
+
+# The bundled marketplace container does not exist in the add-on world.
+export MARKETPLACE_URL=""
+
+bashio::log.info "Starting Yapaia backend (uvicorn) ..."
+cd /opt/yapaia/backend
+exec uvicorn app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1 \
+    --log-level "${LOG_LEVEL}"

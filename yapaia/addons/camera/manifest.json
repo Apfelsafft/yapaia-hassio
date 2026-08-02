@@ -1,0 +1,25 @@
+{
+  "id": "camera",
+  "name": "Kamera",
+  "version": "1.0.0",
+  "description": "MJPEG-Kamerastreaming: zeigt die Kamera auf der Karte an und stellt MJPEG-Streams bereit, z.B. für Home Assistant.",
+  "icon": "📷",
+  "author": "Yapaia Team",
+  "category": "utility",
+  "capabilities": ["settings"],
+  "min_navi_version": "0.4.0",
+  "settings_schema": [
+    {
+      "key": "default_quality",
+      "type": "select",
+      "label": "Standard-Qualität",
+      "default": "medium",
+      "options": [
+        {"value": "low", "label": "Niedrig (320p, 5 fps)"},
+        {"value": "medium", "label": "Mittel (640p, 10 fps)"},
+        {"value": "high", "label": "Hoch (960p, 15 fps)"},
+        {"value": "hd", "label": "HD (1280p, 15 fps)"}
+      ]
+    }
+  ]
+}
